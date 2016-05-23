@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">projectManagement</string>
+    <string name="app_error">应用程序错误</string>
+    <string name="app_error_message">很抱歉，应用程序出现错误，即将退出。\n将此错误报告提交给磐彩，我们会尽快修复这个问题，谢谢！</string>
+    <string name="submit_report">提交报告</string>
+    <string name="net_error_tip">当前网络不可用，请检查你的网络设置</string>
+
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_first_set">FirstSetActivity</string>
+</resources>
