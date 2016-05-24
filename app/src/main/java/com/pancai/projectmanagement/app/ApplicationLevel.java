@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
  * Created by rsmin on 2016/5/19.
  */
 public class ApplicationLevel extends Application {
+    public LoginUser loginUser;
     public String userPreviledge;
     private static ApplicationLevel applicationLevel;
     private SharePreferenceLoginUtil spLoginUtil;
@@ -31,6 +32,7 @@ public class ApplicationLevel extends Application {
         appGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
                 .create();
         spLoginUtil = new SharePreferenceLoginUtil(this, SP_Login_File_Name);
+        loginUser = new LoginUser();
     }
 
     public synchronized SharePreferenceLoginUtil getSpUtil() {
@@ -71,5 +73,10 @@ public class ApplicationLevel extends Application {
         inprogress,
         cancelled,
         compelete;
+    }
+
+    public class LoginUser{
+        public String userId="";
+        public String userPreviledge="";
     }
 }

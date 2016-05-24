@@ -13,9 +13,13 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.pancai.projectmanagement.util.L;
+import com.pancai.projectmanagement.util.ServerOperations;
 import com.pancai.projectmanagement.util.SharePreferenceLoginUtil;
 import com.pancai.projectmanagement.app.ApplicationLevel;
 import com.pancai.projectmanagement.R;
+
+import org.json.JSONObject;
 
 public class FirstSetActivity extends Activity{
     private final static int LOGIN_SUCCESS = 1;
@@ -28,6 +32,7 @@ public class FirstSetActivity extends Activity{
     private LoginTask loginTask;
     private SharePreferenceLoginUtil spUtil;
     private ApplicationLevel mApplication;
+    private ServerOperations serverOperations;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -92,10 +97,8 @@ public class FirstSetActivity extends Activity{
     }
 
     public class LoginTask extends AsyncTask<Void, Integer, Void> {
-        private String privilege;
         private ProgressDialog dialog = null;
-
-        LoginHttp loginHttp = new LoginHttp();
+        ServerOperations serverOperations = new ServerOperations();
 
         @Override
         protected void onPreExecute(){
@@ -105,8 +108,8 @@ public class FirstSetActivity extends Activity{
 
         @Override
         protected Void doInBackground(Void... params) {
-            loginHttp.send(userString, passwordString);
-            publishProgress(loginHttp.getLoginStatus());
+            serverOperations.login(userString, passwordString);
+            publishProgress(serverOperations.status);
             return null;
         }
 
@@ -115,13 +118,16 @@ public class FirstSetActivity extends Activity{
             super.onProgressUpdate(values);
             dialog.dismiss();
             if (values[0]==1) { //登陆成功
-                this.privilege = loginHttp.getPrivilege();
-                spUtil.setPassword(userString);
-                spUtil.setUserId( passwordString);
-                spUtil.setUserPrivilege(this.privilege);
-                mApplication.userPreviledge = this.privilege;
+                try {
+                    JSONObject jsonObjectLogin = new JSONObject(serverOperations.returnResult);
+                    mApplication.loginUser.userId=jsonObjectLogin.getString("userId");
+                    mApplication.loginUser.userPreviledge = jsonObjectLogin.getString("userPreviledge");
+                }catch(Exception e){
+                    L.i(e.getMessage());
+                }
             }
-            mHandler.sendEmptyMessage(values[0]);
+            else
+                mHandler.sendEmptyMessage(values[0]);
         }
     }
 
