@@ -21,43 +21,41 @@ public class ServerOperations {
     private String serverAddress;
 
     public String returnResult;
-    public int status = 0;
+    public int status=0;
 
-    public ServerOperations() {
+    public ServerOperations(){
         mApplication = ApplicationLevel.getInstance();
         serverAddress = mApplication.getString(R.string.server_url);
         connTimeout = Integer.parseInt(mApplication.getString(R.string.connection_out_of_time));
     }
 
-    public void login(String userId, String password) {
+    public void login(String userId, String password){
         String result = null;
-        returnResult = "";
-        String url = serverAddress + loginMethod;
+        returnResult="";
+        String url = serverAddress+loginMethod;
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("userId", userId);
-            jsonObject.put("password", password);
-        } catch (Exception e) {
+            jsonObject.put("password",password);
+        } catch(Exception e){
             e.printStackTrace();
         }
         NetConn connectToServer = new NetConn(url);
         //return serverResponse (JsonString)
-        returnResult = connectToServer.HttpURLConnection_Post(jsonObject.toString());
-        this.status = connectToServer.status;
+        returnResult =  connectToServer.HttpURLConnection_Post(jsonObject.toString());
+        this.status=connectToServer.status;
     }
 
     private class NetConn {
         private String postURL;
-        public int status = 0; //-1 连接失败， 0 连接中，1 连接成功
+        public int status=0; //-1 连接失败， 0 连接中，1 连接成功
         private HttpURLConnection urlConn;
-
-        public NetConn(String postURL) {
-            this.postURL = postURL;
+        public NetConn(String postURL){
+            this.postURL=postURL;
             urlConn = null;
         }
-
         public String HttpURLConnection_Post(String strJson) {
-            String returnString = "";
+            String returnString="";
             try {
                 //通过openConnection 连接
                 URL url = new URL(postURL);
@@ -83,16 +81,16 @@ public class ServerOperations {
                 out.flush();
                 out.close();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), "UTF8"));
-                String inputLine = "";
-                while ((inputLine = reader.readLine()) != null) {
-                    returnString += inputLine;
+                String inputLine="";
+                while((inputLine=reader.readLine())!=null){
+                    returnString+=inputLine;
                 }
                 this.status = 1;
             } catch (Exception e) {
                 this.status = -1;
-                returnString = "";
+                returnString="";
                 e.printStackTrace();
-            } finally {
+            } finally{
                 urlConn.disconnect();
                 return returnString;
             }
