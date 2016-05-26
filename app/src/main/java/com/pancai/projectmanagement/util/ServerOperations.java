@@ -16,7 +16,7 @@ import org.json.JSONObject;
  */
 public class ServerOperations {
     private int connTimeout;
-    private static final String loginMethod = "login";
+    private static final String loginMethod = "loginMethod";
     private ApplicationLevel mApplication;
     private String serverAddress;
 
@@ -74,13 +74,13 @@ public class ServerOperations {
                 //DataOutputStream流
                 DataOutputStream out = new DataOutputStream(urlConn.getOutputStream());
                 //要上传的参数
-                byte[] content = strJson.getBytes("UTF8");
+                byte[] content = strJson.getBytes("UTF-8");
                 //将要上传的内容写入流中
                 out.write(content, 0, content.length);
                 //刷新、关闭
                 out.flush();
                 out.close();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), "UTF8"));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream(), "UTF-8"));
                 String inputLine="";
                 while((inputLine=reader.readLine())!=null){
                     returnString+=inputLine;

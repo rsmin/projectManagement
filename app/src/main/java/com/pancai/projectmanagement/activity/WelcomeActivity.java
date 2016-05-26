@@ -40,7 +40,8 @@ public class WelcomeActivity extends Activity{
                 case LOGIN_FAIL:
                     T.showShort(WelcomeActivity.this, "登录超时");
                     //add terminating login thread
-                    loginTask.cancel(true);
+                    if(loginTask != null && loginTask.getStatus() != AsyncTask.Status.FINISHED)
+                        loginTask.cancel(true);
                     //end of login thread
                     isLogin=false;
                     break;
@@ -55,7 +56,8 @@ public class WelcomeActivity extends Activity{
         @Override
         public void run() {
             if(isLogin==false) {
-                loginTask.cancel(true);
+                if(loginTask != null && loginTask.getStatus() != AsyncTask.Status.FINISHED)
+                     loginTask.cancel(true);
                 startActivity(new Intent(WelcomeActivity.this, FirstSetActivity.class));;
             }
             else {
@@ -70,7 +72,7 @@ public class WelcomeActivity extends Activity{
         setContentView(R.layout.activity_welcome);
         mApplication = ApplicationLevel.getInstance();
         spLoginUtil=mApplication.getSpUtil();
-
+        loginTask = new LoginTask();
         if(!NetUtil.isNetConnected(this)){
             T.showShort(this, R.string.net_error_tip);
             isLogin=false;
@@ -80,7 +82,6 @@ public class WelcomeActivity extends Activity{
             password = spLoginUtil.getPassword();
             //start login process, create a new thread to login
             if(id.length()!=0 && password.length()!=0){
-                loginTask = new LoginTask();
                 loginTask.execute();
             }
         }
@@ -108,9 +109,16 @@ public class WelcomeActivity extends Activity{
             if (values[0]==1) { //登陆成功
                 try {
                     JSONObject jsonObjectLogin = new JSONObject(serverOperations.returnResult);
-                    mApplication.loginUser.userId=jsonObjectLogin.getString("userId");
-                    mApplication.loginUser.userPreviledge = jsonObjectLogin.getString("userPreviledge");
-                    isLogin=true;
+                    Boolean isSuccess=jsonObjectLogin.getBoolean("isSuccess");
+                    if(isSuccess){
+                        mApplication.loginUser.userId=id;
+                        mApplication.loginUser.userPreviledge=jsonObjectLogin.getString("privilige");
+                        isLogin=true;
+                    }
+                    else {
+                        isLogin = false;
+                        throw new Exception(jsonObjectLogin.getString("errorMessage"));
+                    }
                 }catch(Exception e){
                     L.i(e.getMessage());
                 }

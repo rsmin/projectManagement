@@ -41,7 +41,8 @@ public class FirstSetActivity extends Activity{
             switch (msg.what) {
                 case LOGIN_SUCCESS:
                     startActivity(new Intent(FirstSetActivity.this, MainActivity.class));
-                    loginTask.cancel(true);
+                    if(loginTask != null && loginTask.getStatus() != AsyncTask.Status.FINISHED)
+                        loginTask.cancel(true);
                     FirstSetActivity.this.finish();
                     break;
                 case LOGIN_FAIL:
@@ -117,38 +118,24 @@ public class FirstSetActivity extends Activity{
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
             dialog.dismiss();
-            if (values[0]==1) { //登陆成功
+            if (values[0]==1) { //链接成功
                 try {
                     JSONObject jsonObjectLogin = new JSONObject(serverOperations.returnResult);
-                    mApplication.loginUser.userId=jsonObjectLogin.getString("userId");
-                    mApplication.loginUser.userPreviledge = jsonObjectLogin.getString("userPreviledge");
+                    Boolean isSuccess=jsonObjectLogin.getBoolean("isSuccess");
+                    if(isSuccess) {  //登陆成功
+                        mApplication.loginUser.userId = userString;
+                        mApplication.loginUser.userPreviledge = jsonObjectLogin.getString("privilige");
+                        mHandler.sendEmptyMessage(LOGIN_SUCCESS);
+                    }
+                    else{
+                        mHandler.sendEmptyMessage(LOGIN_FAIL);
+                    }
                 }catch(Exception e){
                     L.i(e.getMessage());
                 }
             }
             else
                 mHandler.sendEmptyMessage(values[0]);
-        }
-    }
-
-    public class LoginHttp {
-        private Integer loginStatus = 0; //1 login 成功， -1 login 失败
-        private String returnPrivilege;
-
-        public Integer getLoginStatus(){
-            return loginStatus;
-        }
-        public String getPrivilege(){
-            return returnPrivilege;
-        }
-        public void send(String userId, String password){
-            try {
-                Thread.sleep(5000);//模拟网络加载
-                loginStatus=-1;
-                returnPrivilege="admin";
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 }
